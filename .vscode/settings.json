@@ -1,0 +1,7 @@
+{
+  "vs-browser.favourites.savingProfile": "global",
+  "workbench.externalBrowser": "firefox",
+  "vs-browser.reload.onSave": true,
+  "vs-browser.showMessageDialog": true,
+  "vs-browser.autoCompleteUrl": "https://"
+}

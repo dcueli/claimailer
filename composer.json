@@ -1,0 +1,39 @@
+{
+  "name": "mailer/autosender",
+  "description": "Automatic sender mails in a defined time",
+  "version": "2.1.0",
+  "type": "job",
+  "keywords": [
+    "php",
+    "html",
+    "attachments"
+  ],
+  "license": "MIT",
+  "require": {
+    "phpmailer/phpmailer": "^6.8",
+    "symfony/mailer": "^7.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/app/",
+      "Bootstrap\\": "src/bootstrap/"
+    },
+    "files": [
+      "src/config/Flags.php",
+      "src/app/support/helpers/Summary.php"
+    ],
+    "exclude-from-classmap": [
+      "_DOCS/"
+    ]
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "archive": {
+    "exclude": [
+      "_DOCS",
+      "tests",
+      ".gitignore",
+      "README.md"
+    ]
+  }
+}
