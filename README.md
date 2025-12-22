@@ -50,14 +50,16 @@ Si queremos usar Symfony Mail deberíamos crear `src/app/providers/mail/clients/
 
 ### 🧩 Características principales
 
-- **NO TIENE LICENCIA**, vamos que se puede hacer con esto lo que a uno le venga en gana, lo que le de la gana o lo que se salga de los coj***s. 
-- **NI DE COÑA ME HAGO P\*\*O RESPONSABLE DE LO QUE CADA UNO HAGA CON ESTO**, deberíamos ser ya lo bastante responsables como para saber qué hacer o no, aunque la maldad del ser humano es intrínseca e innata a su ser.
-- Se puede usar como Job o como Servicio
-- No usa base de datos, al menos de momento.
-- Es obligatorio tener una cuanta de correo electrónico para poder enviar.
-- Patrones de diseño utilizados: Singleton, Factory entre otros; los de siempre vamos.
-
----
+- La arquitectura del proyecto se aleja de estándares abstractos para seguir una lógica más coherente, más categórica y vehemente a la par que flexible, al igual que su idioma de desarrollo ya que cada desarrollador, como los escritores, deberían tener su estilo propio de escritura.
+- **Licencia MIT**: Se puede hacer "casi" lo que a uno le venga en gana, o lo que se salga de los coj***s, excepto apropiarse del código fuente original. La atribución es obligatoria.
+- **Cero Responsabilidad**: a ver si lo digo clarito para que se entienda. "*NI DE COÑA ME HAGO P**O RESPONSABLE DE LO QUE CADA UNO HAGA CON ESTO*", deberíamos ser ya lo bastante responsables como para saber qué hacer o no, aunque la maldad del ser humano es intrínseca e innata a su ser.
+- **Flexibilidad de Ejecución**: Diseñado para operar tanto como un Job para ejecuciones puntuales o como un **Servicio** (continuo) según las necesidades de tu infraestructura.
+- **Configuración Simple y Centralizada**: Toda la lógica de envío, la gestión decredenciales, destinatarios, plantillas, etc; se gestiona desde el archivo de configuración y el `index`, permitiendo un uso de "configurar y olvidar".
+- **Sin Dependencias de Base de Datos**: Su funcionamiento es autónomo y no requiere de ninguna conexión o sistema de base de datos, al menos de momento, creo que esto es más un TODO que una característica, pido disculpas por ello, pero así se queda. De momento...
+- Es obligatorio tener una cuenta de correo para que el "_algoritmo_", ahora que está de moda la palabreja otra vez gracias a la IA, pueda enviar correos.
+- **Patrones de diseño**: El núcleo del sistema está construido siguiendo principios de software SOLID y aplicando un conjunto de patrones de diseño para garantizar un código desacoplado, mantenible y escalable. Singleton, Factory, Facade, Adapter, Strategy, Inyección de Dependencias (DI) y DTOs (Data Transfer Objects), entre otros como son **Strategy** para permitir intercambiar el cliente de envío de correo PHPMailer, Symfony Mailer, o el que te haya dado la gana instalar, sin alterar el servicio que lo consume. También **Adapter/Wrapper** para abstraer y adaptar las librerías externas a una interfaz común.
+- **Gestión Eficiente de Recursos**: Incluye un ciclo de vida (`Boot`, `Reset`, `Terminate`) para asegurar un rendimiento óptimo en ejecuciones recurrentes que priorizan el rendimiento, la lógica interna y la claridad sobre esos estándares estúpidos de la "comunidad".
+- **Convenciones de Código Propias y Documentadas**: El proyecto sigue un conjunto estricto y pragmático de convenciones (ver `docs/conventions`).
 
 ## 🧱 Estructura
 **Claimailer**  
@@ -226,38 +228,37 @@ Si queremos usar Symfony Mail deberíamos crear `src/app/providers/mail/clients/
 │  
 └─ **_[otros archivos de configuración]_**  
 
----
-
 ## 💡 ¿Por qué puedes necesitar esto?
 
 ### Casos de uso
+1. **Envío periódico de notificaciones con configuración fija**  
+   Job o Servicio que ejecuta repetidamente el envío de una plantilla HTML predefinida a destinatarios fijos. Ideal para reclamaciones repetitivas, alertas sistemáticas, confirmaciones automáticas o avisos recurrentes donde el contenido y destinatarios no varían.
+2. **Control local sin terceros**  
+   Cualquier aplicación que requiera envío de correo programado completamente autónomo, sin necesidad de APIs de servicios como SendGrid, Mailchimp o AWS SES—evitando costos y dependencias externas.
 
-1. **Respuestas automáticas y notificaciones de recepción**  
-   Administraciones, servicios públicos o sistemas que necesitan confirmar automáticamente la recepción de solicitudes sin depender de servicios de terceros (Mailchimp, SendGrid, AWS SES).
-
-2. **Alertas y recordatorios en sistemas internos**  
-   Notificaciones automáticas de eventos en aplicaciones: cambios de estado, vencimientos, errores críticos, generación de reportes o tareas programadas.
-
-3. **Automatización sin infraestructura compleja**  
-   Integración directa en scripts, jobs cron o servicios que requieren envío de correo sin agregar dependencias externas o costos recurrentes de plataformas especializadas.
-
-### Ventajas
-
-- **Control total**: Usa tu propio servidor SMTP, sin intermediarios.
-- **Sin base de datos**: Almacenamiento de registro de envíos en archivos; arquitectura ligera.
-- **Flexible**: Soporta múltiples proveedores de mail (PHPMailer, Symfony Mailer) mediante adaptadores.
-- **Escalable**: Funciona como Job único o como Servicio continuo según necesidad.
-- **Bajo costo**: Solo requiere una cuenta de correo SMTP válida; sin tarifas por volumen de envío.
-- **Independencia**: No depende de APIs de terceros que pueden cambiar, desaparecer o tener costos prohibitivos.
-
----
+### Ventajas clave
+- **Configuración centralizada y simple**: Todo se define en archivos de config (plantilla, asunto, destinatarios, remitente, credenciales SMTP). Una vez establecido, ejecuta automáticamente.
+- **Bajo costo operacional**: Solo necesita una cuenta SMTP válida (cualquier proveedor). Sin suscripciones, sin pago por volumen, sin intermediarios financieros.
+- **Independencia total**: Control sobre el servidor SMTP propio, sin depender de APIs de terceros que cambian, desaparecen o imponen límites de envío.
+- **Registro transparente**: Contador automático de envíos y almacenamiento de historial de correos en archivos (sin base de datos).
+- **Flexible en infraestructura**: Funciona como Job único (ejecución puntual) o como Servicio continuo según necesidad.
+- **Múltiples proveedores**: Soporta PHPMailer, Symfony Mailer y otros mediante adaptadores—intercambiables sin cambiar lógica del núcleo.
 
 ## 📄 Licencia
 
-Indica claramente el tipo de licencia y cualquier matiz relevante.
-Este proyecto está licenciado bajo la licencia [NOOO TIENE LIENCIA]. Consulta el archivo LICENSE para más detalles.
+Este proyecto se distribuye bajo los términos de la **Licencia MIT**.
 
----
+Esta licencia te concede una amplia libertad para hacer casi cualquier cosa que quieras con el software, incluyendo:
+- **Usar** el software para cualquier propósito, incluso comercial.
+- **Modificarlo** para adaptarlo a tus necesidades.
+- **Distribuirlo** libremente.
+- **Sublicenciarlo** e incluso **venderlo** como parte de un producto tuyo.
+
+La única condición fundamental es que **el aviso de copyright original y el texto de esta licencia deben incluirse** en todas las copias o partes sustanciales del software.
+
+Además, el software se proporciona "tal cual", **sin ninguna garantía**, y los autores no son responsables de ningún daño derivado de su uso.
+
+Para consultar el texto completo y legal, revisa el archivo `LICENSE` que acompaña al proyecto.
 
 ## ⚙️ Instalación
 
