@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 ![Claimailer](https://claimailer.dcueli.com/source/assets/logo.png)
 > Autosender mail
@@ -336,7 +335,3 @@ Notas:
 ---
 
 Contacto: repositorio local en este workspace.
-=======
-# claimailer
-Framework para envío automático de correo electrónico
->>>>>>> c019f55f3eaef3303a49e8a20e7ee3f7b9960a09
