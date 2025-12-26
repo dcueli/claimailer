@@ -1,19 +1,12 @@
+<p align="center"><img src="docs/logo.png" alt="Claimailer Logo" width="600"/></p>
+<h1 align="center">Claimailer</h1>
+<p align="center"><strong>Un framework de correo para PHP moderno, ligero y extensible.</strong></p>
 
-![Claimailer](https://claimailer.dcueli.com/source/assets/logo.png)
-> Autosender mail
-
-# Claimailer — Envío automático de correo electrónico
-
-![Test status](https://github.com/PHPMailer/PHPMailer/workflows/Tests/badge.svg)
-![Latest Stable Version](https://poser.pugx.org/phpmailer/phpmailer/v/stable.svg)
-
-<!-- 
-[![Test status](https://github.com/PHPMailer/PHPMailer/workflows/Tests/badge.svg)](https://github.com/PHPMailer/PHPMailer/actions)
-[![Latest Stable Version](https://poser.pugx.org/phpmailer/phpmailer/v/stable.svg)](https://packagist.org/packages/phpmailer/phpmailer)
-[![Total Downloads](https://poser.pugx.org/phpmailer/phpmailer/downloads)](https://packagist.org/packages/phpmailer/phpmailer)
-[![License](https://poser.pugx.org/phpmailer/phpmailer/license.svg)](https://packagist.org/packages/phpmailer/phpmailer)
-[![API Docs](https://github.com/phpmailer/phpmailer/workflows/Docs/badge.svg)](https://phpmailer.github.io/PHPMailer/)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/PHPMailer/PHPMailer/badge)](https://api.securityscorecards.dev/projects/github.com/PHPMailer/PHPMailer) -->
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-%3E%3D8.2-8892BF?style=for-the-badge&logo=php" alt="PHP Version">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Version-2.1.0-blue?style=for-the-badge" alt="Version">
+</p>
 
 ## 📄 Descripción y características
 ### ℹ️ ¿Qué resuelve? La necesidad de desarrollo
@@ -37,9 +30,10 @@ Muchos "**_listillos_**" en la "_comunidad de desarrollo_", no sólo de software
 ### 📚 ¿Qué hace?
 
 Simplemente es un software de script, desarrollado en PHP, que puede ser ejecutado como Job o como Servicio para el envío de correos electrónicos sencillos al que únicamente hay que indicar:
-1 - desde que buzón enviar, con sus credeciales,
-2 - a qué direcciones de buzones enviar, incluyendo la posibilidad de hacerlo "Con Copia" (CC) o "Con Copia Oculta" (BCC),
-3 - y qué enviar, esto es el mensaje, incluido la posibilidad de archivos adjuntos.
+
+1. _desde que buzón enviar, con sus credeciales_,
+2. _a qué direcciones de buzones enviar, incluyendo la posibilidad de hacerlo "Con Copia" (CC) o "Con Copia Oculta" (BCC)_,
+3. _y qué enviar, esto es el mensaje, incluido la posibilidad de archivos adjuntos_.
 
 **_Utiliza, obligatoriamente, librerías (o componentes) de envío de correo en PHP para poder reemplazar o mejorar el uso directo de la función mail() de PHP y gestionar así, SMTP, adjuntos, HTML, etc._**
 
@@ -61,7 +55,64 @@ Si queremos usar Symfony Mail deberíamos crear `src/app/providers/mail/clients/
 - **Gestión Eficiente de Recursos**: Incluye un ciclo de vida (`Boot`, `Reset`, `Terminate`) para asegurar un rendimiento óptimo en ejecuciones recurrentes que priorizan el rendimiento, la lógica interna y la claridad sobre esos estándares estúpidos de la "comunidad".
 - **Convenciones de Código Propias y Documentadas**: El proyecto sigue un conjunto estricto y pragmático de convenciones (ver `docs/conventions`).
 
+## 💡 ¿Por qué puedes necesitar esto?
+
+### Casos de uso
+1. **Envío periódico de notificaciones con configuración fija**  
+   Job o Servicio que ejecuta repetidamente el envío de una plantilla HTML predefinida a destinatarios fijos. Ideal para reclamaciones repetitivas, alertas sistemáticas, confirmaciones automáticas o avisos recurrentes donde el contenido y destinatarios no varían.
+2. **Control local sin terceros**  
+   Cualquier aplicación que requiera envío de correo programado completamente autónomo, sin necesidad de APIs de servicios como SendGrid, Mailchimp o AWS SES—evitando costos y dependencias externas.
+
+### Ventajas clave
+- **Configuración centralizada y simple**: Todo se define en archivos de config (plantilla, asunto, destinatarios, remitente, credenciales SMTP). Una vez establecido, ejecuta automáticamente.
+- **Bajo costo operacional**: Solo necesita una cuenta SMTP válida (cualquier proveedor). Sin suscripciones, sin pago por volumen, sin intermediarios financieros.
+- **Independencia total**: Control sobre el servidor SMTP propio, sin depender de APIs de terceros que cambian, desaparecen o imponen límites de envío.
+- **Registro transparente**: Contador automático de envíos y almacenamiento de historial de correos en archivos (sin base de datos).
+- **Flexible en infraestructura**: Funciona como Job único (ejecución puntual) o como Servicio continuo según necesidad.
+- **Múltiples proveedores**: Soporta PHPMailer, Symfony Mailer y otros mediante adaptadores—intercambiables sin cambiar lógica del núcleo.
+
+## 🏗️ Arquitectura
+
+Como no puede ser de otra manera, Claimailer se encuentra basado en los principios SOLID, pero no aplicados desde su forma más dogmática, sino que se adapta o se filtra a la propia visión del desarrollador. El punto clave es la visión del desarrollador,  modificando los principios para mejorar las carcterísticas, rendimiento, funcionalidad y legibilidad propias de cada colaborador, respetando así el estilo de escritura, tono, enfoque y discurso al proyecto.
+
+
+### 1. Principio de Responsabilidad Única (SRP)
+Este es el principio central con el que se guía el diseño de software. La arquitectura del sistema de Inyección de Dependencias (DIC) evita, lo que actualmente se viene observando en los desarrollos, ese "Contenedor monolítico" que mezcla responsabilidades.
+
+- **`Register`**: Su única función es registrar servicios (la "recepción").
+- **`Resolver`**: Su única función es almacenar y recuperar los servicios creados por `Register`.
+- **`Container`**: Actúa como un simple almacén de clave-valor. Orquesta a los dos anteriores sin conocer los detalles de su implementación.
+
+### 2. Principio de Abierto/Cerrado(OCP)
+El sistema está diseñado para ser extensible sin necesidad de modificar el código existente. El mejor ejemplo es el **_MailClientProvider_** con el que se añadie nuevos clientes de correo (como una implementación para SendGrid o Mailgun) creando simplemente un nuevo wrapper que implemente la interfaz IMailer. El núcleo del servicio de envío permanece inalterado.
+
+### 3. Principio de Sustitución de Liskov (LSP)
+Gracias al uso de contratos (interfaces), cualquier implementación concreta puede ser sustituida por otra sin afectar al sistema. Por ejemplo, el MailClientService opera con la interfaz IMailer, por lo que puede usar PHPMailer, SymfonyMailer o cualquier otro cliente futuro de forma intercambiable.
+
+### 4. Principio de Segregación de Interfaces (ISP)
+Se favorecen las interfaces pequeñas y específicas sobre las grandes y genéricas. En src/app/contracts/interfaces se pueden encontrar ejemplos como IGetter, ISetter, IRecipient, que permiten a las clases implementar únicamente los comportamientos que necesitan, evitando la carga de métodos innecesarios.
+
+### 5. Principio de Inversión de Dependencia (DIP)
+Los módulos de alto nivel no dependen de los de bajo nivel; ambos dependen de abstracciones. La clase Application y los servicios no dependen directamente de PHPMailer, sino de la interfaz IMailer. Es el contenedor DIC el que se encarga de "inyectar" la implementación concreta en tiempo de ejecución.
+
+### Otros Patrones de Diseño Relevantes
+Singleton Personalizado: Se utiliza un patrón Singleton a través del SingletonTrait y la interfaz ISingleton, con un ciclo de vida init()/Reset() diseñado específicamente para entornos donde el script se ejecuta de forma repetida (como un Job o tarea programada), asegurando un estado limpio en cada ejecución.
+Wrapper (Adaptador): Los clientes de correo de terceros son envueltos en clases adaptadoras (src/app/providers/mail/clients) que abstraen su complejidad y unifican su comportamiento bajo la interfaz común IMailer.
+
+
+
+
+
+Claimailer se basa en una interpretación estricta del **Principio de Responsabilidad Única**. Esto se refleja en su núcleo:
+
+- **`Register`**: Responsable únicamente de registrar (vincular) interfaces o claves a implementaciones concretas.
+- **`Container`**: Su única función es almacenar y recuperar las vinculaciones creadas por el `Register`. Actúa como un simple almacén de clave-valor.
+- **`Resolver`**: Es el único que sabe cómo construir (resolver) un objeto, manejando sus dependencias a través de la reflexión.
+
+Este enfoque, a diferencia de contenedores DIC más comunes que mezclan estas responsabilidades, garantiza un sistema más predecible y fácil de depurar.
+
 ## 🧱 Estructura
+
 **Claimailer**  
 ├─ `📁 .github/` → _Configuraciones de GitHub (workflows CI/CD, templates de PR, etc.)_  
 ├─ `📁 docs/` → _Documentación adicional, diagramas, convenciones de desarrollo_  
@@ -228,41 +279,13 @@ Si queremos usar Symfony Mail deberíamos crear `src/app/providers/mail/clients/
 │  
 └─ **_[otros archivos de configuración]_**  
 
-## 💡 ¿Por qué puedes necesitar esto?
+## 📋 Requisitos
 
-### Casos de uso
-1. **Envío periódico de notificaciones con configuración fija**  
-   Job o Servicio que ejecuta repetidamente el envío de una plantilla HTML predefinida a destinatarios fijos. Ideal para reclamaciones repetitivas, alertas sistemáticas, confirmaciones automáticas o avisos recurrentes donde el contenido y destinatarios no varían.
-2. **Control local sin terceros**  
-   Cualquier aplicación que requiera envío de correo programado completamente autónomo, sin necesidad de APIs de servicios como SendGrid, Mailchimp o AWS SES—evitando costos y dependencias externas.
+- **PHP >= 8.2**
 
-### Ventajas clave
-- **Configuración centralizada y simple**: Todo se define en archivos de config (plantilla, asunto, destinatarios, remitente, credenciales SMTP). Una vez establecido, ejecuta automáticamente.
-- **Bajo costo operacional**: Solo necesita una cuenta SMTP válida (cualquier proveedor). Sin suscripciones, sin pago por volumen, sin intermediarios financieros.
-- **Independencia total**: Control sobre el servidor SMTP propio, sin depender de APIs de terceros que cambian, desaparecen o imponen límites de envío.
-- **Registro transparente**: Contador automático de envíos y almacenamiento de historial de correos en archivos (sin base de datos).
-- **Flexible en infraestructura**: Funciona como Job único (ejecución puntual) o como Servicio continuo según necesidad.
-- **Múltiples proveedores**: Soporta PHPMailer, Symfony Mailer y otros mediante adaptadores—intercambiables sin cambiar lógica del núcleo.
+## ⚙️ Uso e instalación
 
-## 📄 Licencia
-
-Este proyecto se distribuye bajo los términos de la **Licencia MIT**.
-
-Esta licencia te concede una amplia libertad para hacer casi cualquier cosa que quieras con el software, incluyendo:
-- **Usar** el software para cualquier propósito, incluso comercial.
-- **Modificarlo** para adaptarlo a tus necesidades.
-- **Distribuirlo** libremente.
-- **Sublicenciarlo** e incluso **venderlo** como parte de un producto tuyo.
-
-La única condición fundamental es que **el aviso de copyright original y el texto de esta licencia deben incluirse** en todas las copias o partes sustanciales del software.
-
-Además, el software se proporciona "tal cual", **sin ninguna garantía**, y los autores no son responsables de ningún daño derivado de su uso.
-
-Para consultar el texto completo y legal, revisa el archivo `LICENSE` que acompaña al proyecto.
-
-## ⚙️ Instalación
-
-### 🟢 Instalación para su uso
+### 🟢 Instalación para usar como Job o Servicio
 
 Pensada para personas/equipos que solo necesitan **usar** el servicio (no modificar su código).
 
@@ -280,7 +303,7 @@ Pensada para personas/equipos que solo necesitan **usar** el servicio (no modifi
 
 ---
 
-### 🛠️ Instalación para modificación
+### 🛠️ Instalación para desarrollo y ampliación de funcionalidad
 
 Pensada para **desarrolladores** que van a tocar el código, extenderlo o depurarlo.
 
@@ -298,8 +321,35 @@ Pensada para **desarrolladores** que van a tocar el código, extenderlo o depura
    - Flujo de ramas: `feature/*`, `fix/*`, etc.
    - Reglas mínimas de PR: tests pasando, cobertura mínima, revisión al menos de 1 miembro, etc.
 
+## 🚀 Uso Básico
 
+Aquí tienes un ejemplo completo de cómo enviar un correo. Claimailer se encarga de la complejidad interna.
 
+```php
+<?php
+declare(strict_types=1);
+
+```
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo los términos de la **Licencia MIT**.
+
+Esta licencia te concede una amplia libertad para hacer casi cualquier cosa que quieras con el software, incluyendo:
+- **Usar** el software para cualquier propósito, incluso comercial.
+- **Modificarlo** para adaptarlo a tus necesidades.
+- **Distribuirlo** libremente.
+- **Sublicenciarlo** e incluso **venderlo** como parte de un producto tuyo.
+
+La única condición fundamental es que **el aviso de copyright original y el texto de esta licencia deben incluirse** en todas las copias o partes sustanciales del software.
+
+Además, el software se proporciona "tal cual", **sin ninguna garantía**, y los autores no son responsables de ningún daño derivado de su uso.
+
+Para consultar el texto completo y legal, revisa el archivo `LICENSE` que acompaña al proyecto.
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, abre un *issue* para discutir los cambios propuestos o envía directamente una *pull request* adhiriéndote a las convenciones de código del proyecto.
 
 
 
